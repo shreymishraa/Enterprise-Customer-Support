@@ -26,6 +26,7 @@ from api.schemas import (
     QueryRequest,
     QueryResponse,
 )
+from src.graph.workflow import run_query
 
 load_dotenv()
 
@@ -90,8 +91,6 @@ async def query_endpoint(request: QueryRequest) -> QueryResponse:
     """
     try:
         ensure_workflow()
-        from src.graph.workflow import run_query
-
         state = run_query(
             query=request.query,
             session_id=request.session_id,

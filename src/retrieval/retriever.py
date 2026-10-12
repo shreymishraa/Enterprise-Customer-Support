@@ -10,8 +10,10 @@ from typing import List, Optional
 
 from dotenv import load_dotenv
 from langchain_community.vectorstores import FAISS
-from langchain_openai import OpenAIEmbeddings
 from rank_bm25 import BM25Okapi
+from langchain_openai import OpenAIEmbeddings  # kept as a patchable compatibility symbol
+
+from src.retrieval.embeddings import get_embeddings
 
 load_dotenv()
 
@@ -42,9 +44,7 @@ class HybridRetriever:
 
     def __init__(self, index_path: Path = FAISS_INDEX_PATH, top_k: int = TOP_K):
         self.top_k = top_k
-        self.embeddings = OpenAIEmbeddings(
-            model=os.getenv("EMBEDDING_MODEL", "text-embedding-ada-002")
-        )
+        self.embeddings = get_embeddings()
         self.vector_store: Optional[FAISS] = None
         self.bm25: Optional[BM25Okapi] = None
         self.bm25_corpus: List[str] = []

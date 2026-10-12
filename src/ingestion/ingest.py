@@ -12,8 +12,9 @@ from typing import List, Dict, Any
 from dotenv import load_dotenv
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
-from langchain_openai import OpenAIEmbeddings
 from tqdm import tqdm
+
+from src.retrieval.embeddings import get_embeddings
 
 load_dotenv()
 
@@ -89,7 +90,7 @@ def build_and_save_faiss(
     """
     Embed chunks with OpenAI and persist the FAISS index to disk.
     """
-    embeddings = OpenAIEmbeddings(model=os.getenv("EMBEDDING_MODEL", "text-embedding-ada-002"))
+    embeddings = get_embeddings()
     print(f"Embedding {len(chunks)} chunks …")
     vector_store = FAISS.from_texts(
         texts=chunks,

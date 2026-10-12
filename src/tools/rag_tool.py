@@ -12,7 +12,7 @@ from typing import List, Optional
 
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
-from langchain.schema import HumanMessage, SystemMessage
+from langchain_core.messages import HumanMessage, SystemMessage
 
 from src.retrieval.retriever import RetrievedChunk, get_retriever
 
@@ -59,13 +59,15 @@ def check_relevance(query: str, chunks: List[RetrievedChunk], threshold: float =
     """
     if not chunks:
         return False
-    max_score = max(c.score for c in chunks)
-    if max_score < threshold:
-        return False
     # Term overlap check
     query_terms = set(query.lower().split())
     combined_text = " ".join(c.text.lower() for c in chunks)
     overlap = sum(1 for term in query_terms if term in combined_text)
+    if not os.getenv("OPENAI_API_KEY"):
+        return overlap >= max(1, len(query_terms) // 3)
+    max_score = max(c.score for c in chunks)
+    if max_score < threshold:
+        return False
     return overlap >= max(1, len(query_terms) // 3)
 
 
@@ -101,7 +103,25 @@ def rag_tool(
     retrieved_texts = [c.text for c in chunks]
     retrieval_method = chunks[0].retrieval_method if chunks else "none"
 
-    # Generate response
+    # Generate response. The local path keeps demos runnable without credentials.
+    if not os.getenv("OPENAI_API_KEY"):
+        query_terms = set(query.lower().split())
+        best_chunk = max(
+            chunks,
+            key=lambda chunk: sum(term in chunk.text.lower() for term in query_terms),
+            default=None,
+        )
+        answer = best_chunk.text if best_chunk else "I don't have enough information to answer that."
+        return {
+            "answer": answer,
+            "sources": sources,
+            "confidence": min(0.95, 0.45 + (0.1 * len(chunks))) if chunks else 0.0,
+            "needs_escalation": not is_relevant,
+            "retrieved_context": retrieved_texts,
+            "is_relevant": is_relevant,
+            "retrieval_method": retrieval_method,
+        }
+
     llm = ChatOpenAI(model=LLM_MODEL, temperature=0.1)
     messages = [
         SystemMessage(content=SYSTEM_PROMPT),

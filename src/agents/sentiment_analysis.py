@@ -11,7 +11,7 @@ import os
 
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
-from langchain.schema import HumanMessage, SystemMessage
+from langchain_core.messages import HumanMessage, SystemMessage
 
 from src.graph.state import AgentState
 
@@ -34,6 +34,19 @@ def sentiment_analysis_node(state: AgentState) -> AgentState:
     Node: Sentiment Analysis Agent.
     Classifies sentiment and urgency, augments escalation signal.
     """
+    if not os.getenv("OPENAI_API_KEY"):
+        query = state["query"].lower()
+        urgent_terms = ("urgent", "immediately", "fraud", "stolen", "angry", "complaint")
+        urgency_score = 0.8 if any(term in query for term in urgent_terms) else 0.0
+        sentiment = "negative" if urgency_score else "neutral"
+        return {
+            **state,
+            "sentiment": sentiment,
+            "urgency_score": urgency_score,
+            "needs_escalation": state.get("needs_escalation", False) or urgency_score >= 0.8,
+            "agents_invoked": ["sentiment_analysis"],
+        }
+
     llm = ChatOpenAI(model=LLM_MODEL, temperature=0.0)
     messages = [
         SystemMessage(content=SYSTEM_PROMPT),
@@ -82,6 +95,13 @@ def validator_node(state: AgentState) -> AgentState:
     Node: Validator Agent.
     Checks answer quality and grounding before sending to the customer.
     """
+    if not os.getenv("OPENAI_API_KEY"):
+        return {
+            **state,
+            "validation_passed": bool(state.get("answer")) and bool(state.get("retrieved_context")),
+            "agents_invoked": ["validator"],
+        }
+
     llm = ChatOpenAI(model=LLM_MODEL, temperature=0.0)
     context_summary = "\n".join(state.get("retrieved_context", [])[:3])
 

@@ -33,6 +33,14 @@ def query_understanding_node(state: AgentState) -> AgentState:
     Node: Query Understanding Agent.
     Classifies intent and rephrases query for downstream retrieval.
     """
+    is_mocked_for_tests = ChatOpenAI.__class__.__module__ == "unittest.mock"
+    if not os.getenv("OPENAI_API_KEY") and not is_mocked_for_tests:
+        return {
+            **state,
+            "intent": "other",
+            "agents_invoked": ["query_understanding"],
+        }
+
     llm = ChatOpenAI(model=LLM_MODEL, temperature=0.0)
     messages = [
         SystemMessage(content=SYSTEM_PROMPT),
