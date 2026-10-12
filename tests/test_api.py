@@ -67,17 +67,35 @@ class TestQueryEndpoint:
     def test_query_returns_valid_response(self, mock_run_query, client):
         mock_run_query.return_value = make_mock_state()
 
-        # Patch the import inside the endpoint
-        with patch("api.main.ensure_workflow"):
-            # The test client already patches it; call directly
-            pass
+        resp = client.post(
+            "/query",
+            json={"session_id": "test-123", "query": "How do I reset my password?"},
+        )
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["session_id"] == "test-123"
+        assert data["answer"] == "Click Forgot Password on the login page."
+        assert data["sources"] == ["account_faq.pdf"]
+
+    @patch("api.main.run_query")
+    def test_query_uses_fallback_answer_when_pipeline_returns_none(self, mock_run_query, client):
+        mock_run_query.return_value = make_mock_state(answer=None)
 
         resp = client.post(
             "/query",
             json={"session_id": "test-123", "query": "How do I reset my password?"},
         )
-        # May be 200 or 500 depending on mock scope, but should not crash
-        assert resp.status_code in (200, 500)
+        assert resp.status_code == 200
+        assert resp.json()["answer"] == "I could not generate an answer. Please try again."
+
+    @patch("api.main.run_query", side_effect=FileNotFoundError("missing index"))
+    def test_query_returns_503_when_index_is_missing(self, _mock_run_query, client):
+        resp = client.post(
+            "/query",
+            json={"session_id": "test-123", "query": "How do I reset my password?"},
+        )
+        assert resp.status_code == 503
+        assert "FAISS index not found" in resp.json()["detail"]
 
     def test_query_rejects_empty_query(self, client):
         resp = client.post(
