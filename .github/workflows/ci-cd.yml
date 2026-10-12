@@ -1,0 +1,243 @@
+name: CI/CD Pipeline — Enterprise Customer Support RAG
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_API: ${{ github.repository }}/capstone-rag-api
+  IMAGE_UI: ${{ github.repository }}/capstone-rag-ui
+  PYTHON_VERSION: "3.11"
+
+jobs:
+  # ────────────────────────────────────────────────────────────────────────────
+  # Job 1: Lint
+  # ────────────────────────────────────────────────────────────────────────────
+  lint:
+    name: 🔍 Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install ruff
+        run: pip install ruff==0.6.9
+
+      - name: Run ruff lint
+        run: ruff check src/ api/ ui/ tests/ --output-format=github
+
+      - name: Run ruff format check
+        run: ruff format --check src/ api/ ui/ tests/
+
+  # ────────────────────────────────────────────────────────────────────────────
+  # Job 2: Unit Tests
+  # ────────────────────────────────────────────────────────────────────────────
+  test:
+    name: 🧪 Tests
+    runs-on: ubuntu-latest
+    needs: lint
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      FAISS_INDEX_PATH: data/faiss_index_test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run pytest with coverage
+        run: |
+          pytest tests/ \
+            -v \
+            --tb=short \
+            --cov=src \
+            --cov=api \
+            --cov-report=term-missing \
+            --cov-report=xml:coverage.xml \
+            -p no:warnings
+
+      - name: Upload coverage report
+        uses: codecov/codecov-action@v4
+        if: always()
+        with:
+          file: coverage.xml
+          fail_ci_if_error: false
+
+  # ────────────────────────────────────────────────────────────────────────────
+  # Job 3: Build & Push Docker Images
+  # ────────────────────────────────────────────────────────────────────────────
+  build-and-push:
+    name: 🐳 Build & Push
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata for API image
+        id: meta-api
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_API }}
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix=sha-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push API image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile.api
+          push: true
+          tags: ${{ steps.meta-api.outputs.tags }}
+          labels: ${{ steps.meta-api.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Extract metadata for UI image
+        id: meta-ui
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_UI }}
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix=sha-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push UI image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile.ui
+          push: true
+          tags: ${{ steps.meta-ui.outputs.tags }}
+          labels: ${{ steps.meta-ui.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ────────────────────────────────────────────────────────────────────────────
+  # Job 4: Deploy & Validate
+  # ────────────────────────────────────────────────────────────────────────────
+  deploy-and-validate:
+    name: 🚀 Deploy & Validate
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Start services with Docker Compose
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          docker compose up -d --build
+          echo "Waiting for services to be healthy…"
+          sleep 45
+
+      - name: Validate API health
+        run: |
+          for i in {1..10}; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/health)
+            if [ "$STATUS" -eq 200 ]; then
+              echo "✅ API health check passed (HTTP $STATUS)"
+              break
+            fi
+            echo "Attempt $i: API not ready (HTTP $STATUS). Waiting…"
+            sleep 10
+          done
+          [ "$STATUS" -eq 200 ] || (echo "❌ API failed to start" && exit 1)
+
+      - name: Validate /health endpoint response
+        run: |
+          RESPONSE=$(curl -s http://localhost:8000/health)
+          echo "Health response: $RESPONSE"
+          echo "$RESPONSE" | python3 -c "import json,sys; d=json.load(sys.stdin); assert d['status']=='ok', 'Status not ok'"
+          echo "✅ Health endpoint validated"
+
+      - name: Validate /docs (Swagger UI)
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/docs)
+          [ "$STATUS" -eq 200 ] && echo "✅ Swagger UI accessible" || (echo "❌ Swagger UI failed" && exit 1)
+
+      - name: Smoke test /feedback endpoint
+        run: |
+          RESPONSE=$(curl -s -X POST http://localhost:8000/feedback \
+            -H "Content-Type: application/json" \
+            -d '{"session_id":"ci-test","query":"test","answer":"test answer","rating":"thumbs_up"}')
+          echo "Feedback response: $RESPONSE"
+          echo "$RESPONSE" | python3 -c "import json,sys; d=json.load(sys.stdin); assert d['status']=='success'"
+          echo "✅ Feedback endpoint validated"
+
+      - name: Show container logs on failure
+        if: failure()
+        run: docker compose logs
+
+      - name: Tear down services
+        if: always()
+        run: docker compose down --volumes
+
+  # ────────────────────────────────────────────────────────────────────────────
+  # Job 5: Rollback (runs if deploy fails)
+  # ────────────────────────────────────────────────────────────────────────────
+  rollback:
+    name: ⏪ Rollback
+    runs-on: ubuntu-latest
+    needs: deploy-and-validate
+    if: failure()
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pull previous stable image and redeploy
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          echo "⚠️ Deployment failed. Rolling back to previous stable image…"
+          # Pull the previously tagged 'stable' image
+          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_API }}:stable || true
+          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_UI }}:stable || true
+          echo "✅ Rollback images pulled. Re-deploy with stable tags manually or via next pipeline run."
+
+      - name: Notify rollback
+        run: |
+          echo "🚨 ROLLBACK triggered for commit ${{ github.sha }}"
+          echo "   Branch: ${{ github.ref }}"
+          echo "   Actor: ${{ github.actor }}"

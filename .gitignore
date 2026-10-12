@@ -1,0 +1,53 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Environment variables
+.env
+
+# FAISS index (large binary — regenerate via ingestion)
+data/faiss_index/
+
+# Feedback log (runtime data)
+data/feedback_log.jsonl
+
+# Evaluation results
+data/eval_results.json
+
+# Test artifacts
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+*.dockerignore
+
+# Notebooks checkpoints
+.ipynb_checkpoints/
+
+# Ruff cache
+.ruff_cache/

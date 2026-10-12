@@ -1,0 +1,162 @@
+[
+  {
+    "id": "faq_001",
+    "category": "account",
+    "question": "How do I reset my account password?",
+    "answer": "To reset your password, go to the login page and click 'Forgot Password'. Enter your registered email address. You will receive a password reset link within 5 minutes. Click the link, enter your new password (minimum 8 characters, must include uppercase, lowercase, and a number), and confirm. If you don't receive the email, check your spam folder or contact support at support@company.com.",
+    "source": "account_faq.pdf",
+    "page": 1
+  },
+  {
+    "id": "faq_002",
+    "category": "account",
+    "question": "How do I update my billing information?",
+    "answer": "To update billing information, log into your account and navigate to 'Settings' > 'Billing & Payments'. Click 'Edit Payment Method' and enter your new card details. Your changes are saved immediately and will apply to the next billing cycle. We accept Visa, MasterCard, American Express, and PayPal.",
+    "source": "account_faq.pdf",
+    "page": 2
+  },
+  {
+    "id": "faq_003",
+    "category": "account",
+    "question": "How do I delete my account?",
+    "answer": "Account deletion is permanent and cannot be undone. To delete your account: go to Settings > Account > Delete Account. You will be asked to confirm your password and acknowledge that all data will be permanently erased. Account deletion takes effect immediately. Any active subscriptions will be cancelled and you will not be charged further. You may receive a prorated refund for unused subscription days.",
+    "source": "account_faq.pdf",
+    "page": 3
+  },
+  {
+    "id": "faq_004",
+    "category": "billing",
+    "question": "What is your refund policy?",
+    "answer": "We offer a 30-day money-back guarantee for all new subscriptions. If you are not satisfied within the first 30 days, contact us at billing@company.com and we will issue a full refund within 5-7 business days. After 30 days, refunds are only available in exceptional circumstances at our discretion. Annual plans can be prorated if cancelled within the first 60 days.",
+    "source": "billing_policy.pdf",
+    "page": 1
+  },
+  {
+    "id": "faq_005",
+    "category": "billing",
+    "question": "Why was I charged twice?",
+    "answer": "Duplicate charges can occur due to a billing system error or if two separate subscriptions were activated. To resolve this: check your account under Settings > Billing for active subscriptions. If you see duplicate entries, contact our billing team at billing@company.com with your order numbers. We will investigate within 24 hours and issue a refund for any erroneous charges within 3-5 business days.",
+    "source": "billing_policy.pdf",
+    "page": 4
+  },
+  {
+    "id": "faq_006",
+    "category": "billing",
+    "question": "How do I cancel my subscription?",
+    "answer": "To cancel your subscription, go to Settings > Billing > Cancel Subscription. Select your reason for cancellation (optional) and confirm. Your subscription will remain active until the end of the current billing period. You will not be charged for the next cycle. You will receive a cancellation confirmation email. If you cancel an annual plan within 60 days, you may be eligible for a prorated refund.",
+    "source": "billing_policy.pdf",
+    "page": 2
+  },
+  {
+    "id": "faq_007",
+    "category": "technical",
+    "question": "The application is loading slowly. What should I do?",
+    "answer": "If the application is slow, try these steps: (1) Clear your browser cache and cookies. (2) Disable browser extensions. (3) Check your internet connection speed at speedtest.net — we recommend at least 10 Mbps. (4) Try a different browser (Chrome or Firefox recommended). (5) If using mobile, ensure you are on WiFi. (6) Check our status page at status.company.com for any ongoing incidents. If the problem persists, contact support with your browser version and OS.",
+    "source": "technical_support.pdf",
+    "page": 5
+  },
+  {
+    "id": "faq_008",
+    "category": "technical",
+    "question": "I cannot log into my account. What should I do?",
+    "answer": "If you cannot log in: (1) Verify you are using the correct email address. (2) Check Caps Lock is off. (3) Use 'Forgot Password' to reset your password. (4) Clear browser cookies and try again. (5) Try an incognito/private browsing window. (6) If you use SSO (Single Sign-On) via Google or Microsoft, ensure you click the correct SSO button. (7) If your account has been locked after multiple failed attempts, wait 30 minutes or contact support@company.com.",
+    "source": "technical_support.pdf",
+    "page": 1
+  },
+  {
+    "id": "faq_009",
+    "category": "technical",
+    "question": "How do I integrate the API with my system?",
+    "answer": "Our REST API supports JSON payloads and uses Bearer token authentication. To get started: (1) Create an API key under Settings > Developer > API Keys. (2) Read our API documentation at docs.company.com/api. (3) Use the base URL https://api.company.com/v1. (4) Include your API key in the Authorization header: 'Authorization: Bearer YOUR_API_KEY'. (5) Rate limits apply: 1000 requests/hour for standard plans, 10000/hour for enterprise. Contact developer-support@company.com for integration assistance.",
+    "source": "api_guide.pdf",
+    "page": 1
+  },
+  {
+    "id": "faq_010",
+    "category": "shipping",
+    "question": "How long does shipping take?",
+    "answer": "Shipping times vary by location and shipping method: Standard shipping (5-7 business days) is free for orders over $50. Express shipping (2-3 business days) costs $12.99. Overnight shipping (next business day) costs $24.99 and must be ordered before 2 PM EST. International shipping takes 10-21 business days. Orders are processed within 1-2 business days. You will receive a tracking number via email once your order ships.",
+    "source": "shipping_policy.pdf",
+    "page": 1
+  },
+  {
+    "id": "faq_011",
+    "category": "shipping",
+    "question": "My package was lost or damaged. What should I do?",
+    "answer": "If your package is lost or damaged: (1) First, check the tracking number on the carrier's website for the latest status. (2) If marked as delivered but not received, check with neighbors and building management. (3) Wait 48 hours as packages are sometimes marked delivered early. (4) If still missing, contact us at shipping@company.com with your order number and tracking number. (5) We will file a claim with the carrier and send a replacement within 3-5 business days or issue a full refund. Photos of damage are required for damaged items.",
+    "source": "shipping_policy.pdf",
+    "page": 3
+  },
+  {
+    "id": "faq_012",
+    "category": "returns",
+    "question": "How do I return a product?",
+    "answer": "To return a product: (1) Ensure the item is within the 30-day return window from delivery date. (2) Items must be unused, in original packaging, with all tags attached. (3) Log into your account and go to Orders > Select Order > Return Item. (4) Print the prepaid return shipping label. (5) Drop off the package at any authorized carrier location. (6) Refunds are processed within 5-7 business days of receiving the return. Digital downloads and perishable goods cannot be returned.",
+    "source": "returns_policy.pdf",
+    "page": 1
+  },
+  {
+    "id": "faq_013",
+    "category": "privacy",
+    "question": "How is my personal data handled?",
+    "answer": "We take privacy seriously. Your personal data is: (1) Stored securely on encrypted servers in ISO 27001 certified data centers. (2) Never sold to third parties. (3) Shared only with trusted service providers under strict data processing agreements. (4) Retained for as long as your account is active plus 2 years for legal compliance. (5) Subject to GDPR and CCPA rights — you can request data export or deletion at privacy@company.com. Read our full Privacy Policy at company.com/privacy.",
+    "source": "privacy_policy.pdf",
+    "page": 1
+  },
+  {
+    "id": "faq_014",
+    "category": "plans",
+    "question": "What are the differences between the pricing plans?",
+    "answer": "We offer three plans: (1) Basic ($9.99/month): 5 users, 10 GB storage, email support, core features. (2) Professional ($29.99/month): 25 users, 100 GB storage, priority support, advanced analytics, API access. (3) Enterprise ($99.99/month): Unlimited users, unlimited storage, 24/7 phone support, custom integrations, dedicated account manager, SSO, SLA guarantee. Annual billing saves 20%. Compare plans at company.com/pricing.",
+    "source": "pricing_guide.pdf",
+    "page": 1
+  },
+  {
+    "id": "faq_015",
+    "category": "plans",
+    "question": "Can I upgrade or downgrade my plan?",
+    "answer": "Yes, you can change your plan at any time. To upgrade: go to Settings > Billing > Change Plan, select the new plan, and confirm. The upgrade takes effect immediately and you are billed a prorated amount for the remainder of the billing cycle. To downgrade: same steps, but the change takes effect at the end of your current billing cycle. Downgrading may result in loss of features and data that exceed the new plan limits. We recommend exporting data before downgrading.",
+    "source": "pricing_guide.pdf",
+    "page": 3
+  },
+  {
+    "id": "faq_016",
+    "category": "technical",
+    "question": "How do I enable two-factor authentication?",
+    "answer": "Two-factor authentication (2FA) adds an extra layer of security. To enable it: (1) Go to Settings > Security > Two-Factor Authentication. (2) Click 'Enable 2FA'. (3) Choose your method: Authenticator App (recommended) or SMS. (4) For authenticator app, scan the QR code with Google Authenticator or Authy. (5) Enter the 6-digit code to verify and save. (6) Store your backup codes securely — these are your only way to access your account if you lose your device.",
+    "source": "security_guide.pdf",
+    "page": 1
+  },
+  {
+    "id": "faq_017",
+    "category": "account",
+    "question": "How do I add team members to my account?",
+    "answer": "To add team members: (1) Go to Settings > Team Management. (2) Click 'Invite Member'. (3) Enter their email address and select their role: Admin, Editor, or Viewer. (4) Click Send Invite. They will receive an email invitation valid for 48 hours. (5) Once they accept, they appear under your team list. Team member limits depend on your plan: Basic (5), Professional (25), Enterprise (unlimited). Admins can manage team members and billing; Editors can create/edit content; Viewers can only view.",
+    "source": "team_guide.pdf",
+    "page": 1
+  },
+  {
+    "id": "faq_018",
+    "category": "technical",
+    "question": "What browsers and devices are supported?",
+    "answer": "Our platform supports: Desktop browsers: Chrome 90+, Firefox 88+, Safari 14+, Edge 90+. Mobile browsers: Chrome for Android, Safari for iOS 14+. Operating systems: Windows 10+, macOS 10.15+, Linux (Ubuntu 20.04+), iOS 14+, Android 10+. We do not support Internet Explorer. For the best experience, we recommend Chrome on desktop. Mobile apps are available on iOS App Store and Google Play. Minimum screen resolution: 1280x720.",
+    "source": "technical_support.pdf",
+    "page": 8
+  },
+  {
+    "id": "faq_019",
+    "category": "billing",
+    "question": "Do you offer discounts for non-profits or students?",
+    "answer": "Yes! We offer special pricing: Non-profits: 30% discount on all plans with valid 501(c)(3) documentation. Students: 50% discount on the Professional plan with a valid .edu email or student ID. Educational institutions: Contact us for volume licensing. Startups: If you are an early-stage startup (less than 2 years old, under $1M funding), apply for our Startup Program for 6 months free. Apply at company.com/discounts or contact sales@company.com.",
+    "source": "pricing_guide.pdf",
+    "page": 5
+  },
+  {
+    "id": "faq_020",
+    "category": "account",
+    "question": "How do I export my data?",
+    "answer": "You can export your data at any time: (1) Go to Settings > Data & Privacy > Export Data. (2) Select the data types to export: profile, content, activity history, or all. (3) Choose format: JSON or CSV. (4) Click 'Request Export'. (5) You will receive a download link via email within 24 hours (large accounts may take up to 72 hours). (6) The link is valid for 7 days. For GDPR data portability requests, contact privacy@company.com. Exports are free and unlimited.",
+    "source": "privacy_policy.pdf",
+    "page": 4
+  }
+]
